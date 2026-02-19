@@ -1,59 +1,138 @@
-# Syseasyembranet
+# 🖥️ EasyEmbranet — Interface Web (Frontend Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.8.
+Interface web responsável por **gerenciar redes e visualizar dispositivos encontrados via mapeamento SNMP**.
 
-## Development server
+Este frontend consome a API do backend (Scanner SNMP) e permite:
 
-To start a local development server, run:
+- Mapear redes
+- Visualizar dispositivos encontrados
+- Adicionar dispositivos ao inventário
+- Gerenciar redes cadastradas
+- Visualizar status e nível de sinal dos rádios
 
-```bash
+---
+
+## ✅ O que este projeto faz
+
+- Lista redes cadastradas
+- Executa mapeamento de rede via API
+- Exibe dispositivos encontrados dinamicamente
+- Indica:
+  - Status do SNMP (OK / erro)
+  - IP do dispositivo
+  - SSID
+  - Nome do rádio
+  - Nível de sinal (com indicador visual)
+- Permite adicionar dispositivos encontrados ao inventário
+- Interface responsiva com layout em cards
+
+---
+
+## 🧩 Arquitetura
+
+O frontend consome a API:
+
+POST /api/v1/redes/mapear/{idRede}
+
+### Exemplo de resposta da API:
+
+[
+  {
+    "Status": "Ok",
+    "ip": "10.10.29.27",
+    "mac": "04:18:d6:5f:89:78",
+    "nivelDeSinal": "-63",
+    "nomeRadio": "6065_RES_FERNANDO_MIRANDA",
+    "ssid": "lafbase03"
+  }
+]
+
+A interface renderiza dinamicamente esses dados usando:
+
+- Angular Signals
+- *ngFor
+- Component-based layout
+- Bootstrap 5
+
+---
+
+## 🛠️ Tecnologias
+
+- Angular (Standalone Components)
+- TypeScript
+- Bootstrap 5
+- Angular Signals
+- HttpClient (REST API)
+
+---
+
+## 🚀 Como executar
+
+### 📌 Pré-requisitos
+
+- Node.js 18+
+- Angular CLI
+- Backend rodando (API SNMP Scanner)
+
+---
+
+### 📦 Instalar dependências
+
+npm install
+
+---
+
+### ▶️ Executar em modo desenvolvimento
+
 ng serve
-```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+A aplicação ficará disponível em:
 
-## Code scaffolding
+http://localhost:4200
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+---
 
-```bash
-ng generate component component-name
-```
+## 📂 Estrutura do projeto
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+src/
+ ├── app/
+ │    ├── components/
+ │    ├── services/
+ │    ├── models/
+ │    └── pages/
+ ├── environments/
+ └── assets/
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+## 🎯 Funcionalidades principais
 
-To build the project run:
+### 🔍 Mapeamento de Rede
 
-```bash
-ng build
-```
+- Envia requisição para o backend para mapear a rede selecionada
+- Renderiza uma lista de dispositivos encontrados
+- Exibe erros de SNMP de forma visual (itens destacados)
+- Permite adicionar um dispositivo encontrado ao inventário pelo botão +
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 🧭 Roadmap (próximos passos)
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- [ ] Tela de inventário (dispositivos cadastrados)
+- [ ] Filtros por SSID, sinal e status
+- [ ] Ordenação por nível de sinal
+- [ ] Indicador de carregamento / progresso durante o mapeamento
+- [ ] Dashboard com métricas (dispositivos online/offline, por rede, etc.)
 
-```bash
-ng test
-```
+---
 
-## Running end-to-end tests
+## ⚠️ Observações importantes
 
-For end-to-end (e2e) testing, run:
+- O frontend depende do backend em execução e acessível via URL configurada em environment
+- Para produção, recomenda-se configurar proxy / CORS adequadamente e servir o build com Nginx/Traefik
 
-```bash
-ng e2e
-```
+---
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 📄 Licença
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Este projeto pode ser usado e adaptado conforme sua necessidade.
