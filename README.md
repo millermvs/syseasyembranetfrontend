@@ -100,9 +100,6 @@ src/
  │    ├── services/
  │    ├── models/
  │    └── pages/
- ├── environments/
- └── assets/
-
 ---
 
 ## 🎯 Funcionalidades principais

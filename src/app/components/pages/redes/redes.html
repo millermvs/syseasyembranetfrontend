@@ -1,0 +1,172 @@
+<div class="container-fluid medicos-page">
+
+    <!-- TÍTULO + BOTÃO NOVO -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="mb-0">Redes</h2>
+            <small class="text-muted">Gerencie as redes cadastradas no sistema</small>
+        </div>
+
+        <div class="col-auto">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCadastroMedico">
+                + Nova Rede
+            </button>
+        </div>
+    </div>
+
+    <!-- ALERTA -->
+    <div *ngIf="mensagemPagPrincipal() != ''" class="alert alert-{{tipoMensagem()}} alert-dismissible fade show">
+        <strong>{{ mensagemPagPrincipal() }}</strong>
+        <button type="button" class="btn-close" aria-label="Close" (click)="mensagemPagPrincipal.set('')"></button>
+    </div>
+
+    <!-- GRID 3 QUADRADOS -->
+    <div class="row g-3">
+
+        <!-- QUADRADO 1: LISTA (tabela compacta) -->
+        <div class="col-12 col-lg-6 col-xl-4">
+            <div class="card box-card">
+                <div class="card-header box-header text-center">
+                    <strong>Redes cadastradas</strong>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0 align-middle redes-table">
+                            <thead class="thead-brand">
+                                <tr>
+                                    <th>Rede</th>
+                                    <th class="text-center" style="width: 120px;">Dispositivos</th>
+                                    <th class="text-center" style="width: 170px;">Ações</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <!-- depois vira *ngFor -->
+                                <tr>
+                                    <td class="fw-semibold">10.10.29.0</td>
+                                    <td class="text-center">6</td>
+                                    <td class="text-center">
+                                        <div class="acoes-wrap">
+                                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                data-bs-target="#modalConfirmarDesativarRede">
+                                                Excluir
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- exemplo extra (pra você ver como fica) -->
+
+                                <tr>
+                                    <td class="fw-semibold">10.10.50.0</td>
+                                    <td class="text-center">12</td>
+                                    <td class="text-center">
+                                        <div class="acoes-wrap">
+                                            <button class="btn btn-sm btn-outline-danger">Excluir</button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- área extra p/ futuro -->
+                <div class="card-footer box-footer">
+                    <small class="text-muted">Dica: clique em “Iniciar mapeamento” para buscar dispositivos.</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUADRADO 2: MAPEAR NOVA REDE -->
+        <div class="col-12 col-lg-6 col-xl-4">
+            <div class="card box-card">
+                <div class="card-header box-header text-center">
+                    <strong>Mapear nova rede</strong>
+                </div>
+
+                <div class="card-body box-body">
+                    <div class="empty-state">
+                        <div class="empty-title">Pronto para mapear</div>
+                        <div class="empty-sub">Selecione uma rede na lista ou cadastre uma nova.</div>
+
+                        <button class="btn btn-outline-primary mt-2" (click)="mapearRede(52)">
+                            Iniciar mapeamento
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-footer box-footer">
+                    <small class="text-muted">Aqui você pode colocar progresso, último scan, logs, etc.</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUADRADO 3: LISTA DE DISPOSITIVOS ENCONTRADOS -->
+        <div class="col-12 col-xl-4">
+            <div class="card box-card">
+
+                <div class="card-header box-header d-flex align-items-center justify-content-between">
+                    <strong>Dispositivos encontrados</strong>
+
+                    <!-- botão + no topo (opcional) -->
+                    <button class="icon-btn" type="button" title="Adicionar dispositivo"
+                        aria-label="Adicionar dispositivo" data-bs-toggle="modal"
+                        data-bs-target="#modalAdicionarDispositivo">
+                        +
+                    </button>
+                </div>
+
+                <div class="card-body box-body">
+
+                    <!-- LISTA -->
+                    <div class="device-list">
+
+                        <div class="device-item" *ngFor="let d of dispositivosEncontrados()"
+                            [class.device-error]="d.Status !== 'Ok'">
+
+                            <div class="device-main">
+
+                                <!-- Nome ou erro -->
+                                <div class="device-title">
+                                    {{ d.Status === 'Ok' ? d.nomeRadio : 'Falha SNMP' }}
+                                </div>
+
+                                <!-- Linha secundária -->
+                                <div class="device-sub">
+                                    IP: {{ d.ip }}
+                                    <span *ngIf="d.ssid"> • SSID: {{ d.ssid }}</span>
+                                </div>
+
+                                <!-- sinal -->
+                                <div *ngIf="d.nivelDeSinal" class="signal-badge" [ngClass]="{
+          'signal-good': d.nivelDeSinal >= -60,
+          'signal-medium': d.nivelDeSinal < -60 && d.nivelDeSinal >= -70,
+          'signal-bad': d.nivelDeSinal < -70
+        }">
+                                    Sinal: {{ d.nivelDeSinal }} dBm
+                                </div>
+
+                                <!-- mensagem de erro -->
+                                <div *ngIf="d.Status !== 'Ok'" class="device-error-msg">
+                                    {{ d.Status }}
+                                </div>
+
+                            </div>
+
+                            <!-- botão adicionar só se Status for OK -->
+                            <button *ngIf="d.Status === 'Ok'" class="icon-btn add" type="button"
+                                (click)="adicionarDispositivo(d)" title="Adicionar dispositivo">
+                                +
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>

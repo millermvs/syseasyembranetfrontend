@@ -1,0 +1,236 @@
+:host {
+  --brand-blue: #E7F1FF;
+}
+
+/* Card “quadrado/painel” */
+.box-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  min-height: 360px; /* controla o “quadrado” */
+}
+
+.box-header {
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 14px 16px;
+}
+
+.box-body {
+  padding: 16px;
+}
+
+.box-footer {
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  padding: 10px 16px;
+}
+
+/* Cabeçalho azul claro da tabela */
+.table thead.thead-brand th {
+  background-color: var(--brand-blue) !important;
+  color: #000 !important;
+  border-color: rgba(0,0,0,0.08) !important;
+  padding: 12px 14px;
+  font-weight: 600;
+}
+
+/* Tabela mais compacta */
+.redes-table td {
+  padding: 12px 14px;
+}
+
+/* Ações alinhadas e sem gambiarra de width no HTML */
+.acoes-wrap {
+  display: inline-flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Estado vazio bonitinho */
+.empty-state {
+  height: 100%;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px dashed rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+}
+
+.empty-title {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.empty-sub {
+  margin-top: 6px;
+  color: rgba(0,0,0,0.6);
+  font-size: 14px;
+}
+
+/* Quadro 3: grid de “resumo” */
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.quick-item {
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.quick-label {
+  font-size: 12px;
+  color: rgba(0,0,0,0.6);
+}
+
+.quick-value {
+  font-size: 22px;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+/* botão redondinho com ícone */
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .05s ease, background .15s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.icon-btn:active {
+  transform: scale(0.98);
+}
+
+.icon-btn.add {
+  border-color: rgba(13,110,253,0.35);
+}
+
+/* lista de dispositivos */
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.device-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.device-main {
+  min-width: 0; /* importante pra não quebrar layout */
+}
+
+.device-title {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-sub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(0,0,0,0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.device-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+  transition: box-shadow .2s ease;
+}
+
+.device-item:hover {
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+
+.device-error {
+  border-color: rgba(220,53,69,0.4);
+  background: rgba(220,53,69,0.04);
+}
+
+.device-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.device-sub {
+  font-size: 12px;
+  color: rgba(0,0,0,0.6);
+  margin-top: 3px;
+}
+
+.device-error-msg {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #dc3545;
+  font-weight: 500;
+}
+
+/* Sinal */
+
+.signal-badge {
+  margin-top: 6px;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  font-weight: 600;
+}
+
+.signal-good {
+  background: rgba(25,135,84,0.15);
+  color: #198754;
+}
+
+.signal-medium {
+  background: rgba(255,193,7,0.15);
+  color: #b38600;
+}
+
+.signal-bad {
+  background: rgba(220,53,69,0.15);
+  color: #dc3545;
+}
