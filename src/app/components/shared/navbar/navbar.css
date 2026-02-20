@@ -1,55 +1,82 @@
-.app-layout {
-  height: 100vh;              /* ocupa a tela toda */
+/* ===============================
+   RESET BÁSICO
+================================= */
+html, body {
+  height: 100%;
+  margin: 0;
 }
 
-/* ----- SIDEBAR BASE ----- */
+/* ===============================
+   LAYOUT PRINCIPAL
+================================= */
+.layout-container {
+  min-height: 100vh;     /* ocupa no mínimo a tela toda */
+  display: flex;         /* sidebar + conteúdo lado a lado */
+  align-items: stretch;  /* força mesma altura */
+}
+
+/* ===============================
+   CONTEÚDO PRINCIPAL
+================================= */
+.content {
+  flex: 1 1 auto;        /* ocupa o restante da tela */
+  min-width: 0;          /* evita quebra horizontal */
+  overflow-y: auto;      /* rolagem fica só no conteúdo */
+  background-color: #f8f9fa;
+}
+
+/* ===============================
+   SIDEBAR
+================================= */
 .sidebar {
   background-color: #0D6EFD;
   border-right: 1px solid #dee2e6;
-  width: 48px;                /* menu ESTREITO (só ícones) */
+
+  width: 48px;                 /* menu fechado */
   transition: width 0.2s ease;
+
   display: flex;
   flex-direction: column;
   align-items: stretch;
+
+  height: 100vh;               /* ocupa a tela inteira */
+  position: sticky;
+  top: 0;
+
+  flex: 0 0 auto;              /* não deixa encolher */
 }
 
-/* ----- SIDEBAR QUANDO EXPANDIDO ----- */
+/* Quando expandido */
 .sidebar.sidebar-expanded {
-  width: 160px;               /* menu LARGO (ícone + texto) */
+  width: 160px;
 }
 
-/* Botão do topo (tipo o quadradinho do Firefox) */
-.toggle-btn {
+/* ===============================
+   BOTÕES TOPO
+================================= */
+.toggle-btn,
+.close-btn {
   border: none;
   background: transparent;
   padding: 12px;
   width: 100%;
-  text-align: left;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
+  color: #000;
 }
 
 .toggle-btn:hover {
   background-color: #3D8BFD;
 }
 
-.toggle-btn, .close-btn {
-  border: none;
-  background: transparent;
-  padding: 12px;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font-size: 20px;
-}
-
 .close-btn {
-  text-align: right; /* o X fica no canto direito */
+  text-align: right;
   padding-right: 16px;
 }
 
-
-/* ----- ITENS DO MENU ----- */
+/* ===============================
+   MENU
+================================= */
 .menu {
   display: flex;
   flex-direction: column;
@@ -62,7 +89,7 @@
   gap: 8px;
   padding: 8px 12px;
   text-decoration: none;
-  color: #000000;
+  color: #000;
   font-size: 14px;
 }
 
@@ -73,16 +100,15 @@
 /* Ícone sempre visível */
 .menu-icon {
   font-size: 18px;
-  color: #000; /* preto */
+  color: #000;
 }
 
-/* Texto do menu: some quando estiver fechado */
+/* Esconde texto quando fechado */
 .sidebar:not(.sidebar-expanded) .menu-label {
   display: none;
 }
 
-/* Garante que o texto não quebre feio quando aberto */
+/* Evita quebra feia de texto */
 .menu-label {
   white-space: nowrap;
 }
-

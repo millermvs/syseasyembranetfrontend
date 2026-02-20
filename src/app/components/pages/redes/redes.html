@@ -8,7 +8,7 @@
         </div>
 
         <div class="col-auto">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCadastroMedico">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAddRede">
                 + Nova Rede
             </button>
         </div>
@@ -31,7 +31,8 @@
                 </div>
 
                 <div class="card-body p-0">
-                    <div class="table-responsive">
+                    <!-- scroll só no miolo -->
+                    <div class="table-scroll">
                         <table class="table table-sm mb-0 align-middle redes-table">
                             <thead class="thead-brand">
                                 <tr>
@@ -42,44 +43,57 @@
                             </thead>
 
                             <tbody>
-                                <!-- depois vira *ngFor -->
-                                <tr>
-                                    <td class="fw-semibold">10.10.29.0</td>
-                                    <td class="text-center">6</td>
+                                <tr *ngFor="let item of redesPage()?.content; trackBy: trackByRede" class="rede-row"
+                                    (click)="selecionarRedeParaMapear(item)" [class.rede-selected]="redeSelecionadaParaMapear?.idRede === item.idRede">
+
+                                    <td class="fw-semibold">{{ item.rede }}</td>
+                                    <td class="text-center">{{ item.totalEquipamentos }}</td>
+
                                     <td class="text-center">
                                         <div class="acoes-wrap">
-                                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
-                                                data-bs-target="#modalConfirmarDesativarRede">
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                (click)="$event.stopPropagation()" (click)="selecionarRedeParaExcluir(item)" data-bs-toggle="modal"
+                                                data-bs-target="#modalConfirmarExcluirRede">
                                                 Excluir
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
 
-                                <!-- exemplo extra (pra você ver como fica) -->
-
-                                <tr>
-                                    <td class="fw-semibold">10.10.50.0</td>
-                                    <td class="text-center">12</td>
-                                    <td class="text-center">
-                                        <div class="acoes-wrap">
-                                            <button class="btn btn-sm btn-outline-danger">Excluir</button>
-                                        </div>
+                                <tr *ngIf="redesPage() && redesPage()?.content?.length === 0">
+                                    <td colspan="3" class="text-center text-muted py-3">
+                                        Nenhuma rede cadastrada.
                                     </td>
                                 </tr>
-
-
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- área extra p/ futuro -->
-                <div class="card-footer box-footer">
-                    <small class="text-muted">Dica: clique em “Iniciar mapeamento” para buscar dispositivos.</small>
+                <div class="card-footer box-footer d-flex align-items-center justify-content-between gap-2">
+                    <small class="text-muted">
+                        Redes cadastradas: <strong>{{ redesPage()?.totalElements ?? 0 }}</strong>
+
+                    </small>
+
+                    <div class="d-flex gap-2">
+                        <small class="text-muted"> Página {{ (redesPage()?.number ?? 0) + 1 }} de {{
+                            redesPage()?.totalPages ?? 1 }} </small>
+                        <button class="btn btn-sm btn-outline-secondary"
+                            (click)="irParaPagina((redesPage()?.number ?? 0) - 1)" [disabled]="redesPage()?.first">
+                            ←
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-secondary"
+                            (click)="irParaPagina((redesPage()?.number ?? 0) + 1)" [disabled]="redesPage()?.last">
+                            →
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </div>
+
 
         <!-- QUADRADO 2: MAPEAR NOVA REDE -->
         <div class="col-12 col-lg-6 col-xl-4">
@@ -93,14 +107,14 @@
                         <div class="empty-title">Pronto para mapear</div>
                         <div class="empty-sub">Selecione uma rede na lista ou cadastre uma nova.</div>
 
-                        <button class="btn btn-outline-primary mt-2" (click)="mapearRede(52)">
+                        <button class="btn btn-outline-primary mt-2" (click)="mapearRede()" [disabled]="!redeSelecionadaParaMapear">
                             Iniciar mapeamento
                         </button>
                     </div>
                 </div>
 
                 <div class="card-footer box-footer">
-                    <small class="text-muted">Aqui você pode colocar progresso, último scan, logs, etc.</small>
+                    <small class="text-muted">Aqui colocar progresso</small>
                 </div>
             </div>
         </div>
@@ -109,64 +123,160 @@
         <div class="col-12 col-xl-4">
             <div class="card box-card">
 
-                <div class="card-header box-header d-flex align-items-center justify-content-between">
+                <div class="card-header box-header text-center">
                     <strong>Dispositivos encontrados</strong>
-
-                    <!-- botão + no topo (opcional) -->
-                    <button class="icon-btn" type="button" title="Adicionar dispositivo"
-                        aria-label="Adicionar dispositivo" data-bs-toggle="modal"
-                        data-bs-target="#modalAdicionarDispositivo">
-                        +
-                    </button>
                 </div>
 
-                <div class="card-body box-body">
+                <!-- LISTA -->
 
-                    <!-- LISTA -->
-                    <div class="device-list">
+                <div class="card-body box-body p-0">
 
-                        <div class="device-item" *ngFor="let d of dispositivosEncontrados()"
-                            [class.device-error]="d.Status !== 'Ok'">
+                    <div class="device-scroll">
+                        <div class="device-list p-3">
 
-                            <div class="device-main">
 
-                                <!-- Nome ou erro -->
-                                <div class="device-title">
-                                    {{ d.Status === 'Ok' ? d.nomeRadio : 'Falha SNMP' }}
-                                </div>
+                            <div class="device-item" *ngFor="let d of dispositivosEncontrados()"
+                                [class.device-error]="d.Status !== 'SUCESSO'">
 
-                                <!-- Linha secundária -->
-                                <div class="device-sub">
-                                    IP: {{ d.ip }}
-                                    <span *ngIf="d.ssid"> • SSID: {{ d.ssid }}</span>
-                                </div>
+                                <div class="device-main">
 
-                                <!-- sinal -->
-                                <div *ngIf="d.nivelDeSinal" class="signal-badge" [ngClass]="{
+                                    <!-- Nome ou erro -->
+                                    <div class="device-title">
+                                        {{ d.Status === 'SUCESSO' ? d.nomeRadio : 'Falha SNMP' }}
+                                    </div>
+
+                                    <!-- Linha secundária -->
+                                    <div class="device-sub">
+                                        IP: {{ d.ip }}
+                                        <span *ngIf="d.ssid"> • SSID: {{ d.ssid }} • </span>
+                                        Canal: {{d.canalRadio}}
+                                    </div>
+
+                                    <!-- sinal -->
+                                    <div *ngIf="d.nivelDeSinal" class="signal-badge" [ngClass]="{
           'signal-good': d.nivelDeSinal >= -60,
           'signal-medium': d.nivelDeSinal < -60 && d.nivelDeSinal >= -70,
           'signal-bad': d.nivelDeSinal < -70
         }">
-                                    Sinal: {{ d.nivelDeSinal }} dBm
+                                        Sinal: {{ d.nivelDeSinal }} dBm
+                                    </div>
+
+                                    <!-- mensagem de erro -->
+                                    <div *ngIf="d.Status !== 'SUCESSO'" class="device-error-msg">
+                                        {{ d.Status }}
+                                    </div>
+
                                 </div>
 
-                                <!-- mensagem de erro -->
-                                <div *ngIf="d.Status !== 'Ok'" class="device-error-msg">
-                                    {{ d.Status }}
-                                </div>
-
+                                <!-- botão adicionar só se Status for OK -->
+                                <button *ngIf="d.Status !== 'SUCESSO'" class="icon-btn add" type="button"
+                                    (click)="adicionarDispositivo(d)" title="Adicionar dispositivo">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                            <!-- botão adicionar só se Status for OK -->
-                            <button *ngIf="d.Status === 'Ok'" class="icon-btn add" type="button"
-                                (click)="adicionarDispositivo(d)" title="Adicionar dispositivo">
-                                +
-                            </button>
+            <!-- ----------------------------------------------------------------------------------------------------------- -->
+            <!-- --------------------------------------------MODAL DE ADD REDE---------------------------------------------- -->
+            <!-- ----------------------------------------------------------------------------------------------------------- -->
+            <div class="modal fade" id="modalAddRede" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
 
+                        <!-- Cabeçalho -->
+                        <div class="modal-header">
+                            <h5 class="modal-title t text-center w-100">Cadastrar Rede</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- Corpo (formulário) -->
+                        <div class="modal-body">
+                            <form [formGroup]="formAddRede" (ngSubmit)="adcionarRede()">
+
+                                <!-- Rede -->
+                                <div class="mb-3">
+                                    <label class="form-label">IP da Rede</label>
+                                    <input type="text" class="form-control" formControlName="rede"
+                                        [class.is-invalid]="formAddRede.get('rede')?.invalid && formAddRede.get('rede')?.touched">
+
+                                    <div class="invalid-feedback"
+                                        *ngIf="formAddRede.get('rede')?.hasError('required') && formAddRede.get('rede')?.touched">
+                                        IP da Rede é obrigatório.
+                                    </div>
+                                    <div class="invalid-feedback"
+                                        *ngIf="formAddRede.get('rede')?.hasError('pattern') && formAddRede.get('rede')?.touched">
+                                        Informe uma rede válida no formato 192.168.1.0
+                                    </div>
+                                </div>
+
+                                <!-- Mensagem retorno -->
+                                <div [ngClass]="{ 'show': mensagemModal() != '' }"
+                                    class="alert alert-{{ tipoMensagem() }} alert-dismissible fade show"
+                                    *ngIf="mensagemModal() != ''">
+                                    <strong>{{ mensagemModal() }}</strong>
+                                    <button type="button" class="btn-close" aria-label="Close"
+                                        (click)="mensagemModal.set('')"></button>
+                                </div>
+
+                                <!-- Rodapé -->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                                        Cancelar
+                                    </button>
+
+                                    <button type="submit" class="btn btn-dark" [disabled]="formAddRede.invalid">
+                                        Adicionar
+                                    </button>
+
+                                    <!-- Botão escondido só para fechar via TS -->
+                                    <button #btnCloseAddRede type="button" class="d-none" data-bs-dismiss="modal"></button>
+                                </div>
+
+                            </form>
                         </div>
 
                     </div>
+                </div>
+            </div>
+            <!-- ----------------------------------------------------------------------------------------------------------- -->
+            <!-- -------------------------------------------MODAL DE EXCLUIR---------------------------------------------- -->
+            <!-- ----------------------------------------------------------------------------------------------------------- -->
+            <div class="modal fade" id="modalConfirmarExcluirRede" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
 
+                        <!-- Cabeçalho -->
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirmar desativação</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
 
+                        <!-- Corpo -->
+                        <div class="modal-body">
+                            <p>
+                                Tem certeza que deseja excluir a rede
+                                <strong>{{ redeSelecionadaParaExcluir?.rede }}</strong>?
+                            </p>
+                            <p class="text-muted mb-0">
+                                Essa ação <strong>NÃO</strong> poderá ser desfeita.
+                            </p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+
+                            <button type="button" class="btn btn-danger" (click)="excluirRede()"
+                                data-bs-dismiss="modal">
+                                Excluir
+                            </button>
+                        </div>
+
+                    </div>
                 </div>
             </div>

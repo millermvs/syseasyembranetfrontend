@@ -100,6 +100,7 @@ src/
  │    ├── services/
  │    ├── models/
  │    └── pages/
+ 
 ---
 
 ## 🎯 Funcionalidades principais
