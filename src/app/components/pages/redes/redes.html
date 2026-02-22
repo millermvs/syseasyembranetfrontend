@@ -44,7 +44,8 @@
 
                             <tbody>
                                 <tr *ngFor="let item of redesPage()?.content; trackBy: trackByRede" class="rede-row"
-                                    (click)="selecionarRedeParaMapear(item)" [class.rede-selected]="redeSelecionadaParaMapear?.idRede === item.idRede">
+                                    (click)="selecionarRedeParaMapear(item)"
+                                    [class.rede-selected]="redeSelecionadaParaMapear?.idRede === item.idRede">
 
                                     <td class="fw-semibold">{{ item.rede }}</td>
                                     <td class="text-center">{{ item.totalEquipamentos }}</td>
@@ -52,7 +53,8 @@
                                     <td class="text-center">
                                         <div class="acoes-wrap">
                                             <button class="btn btn-sm btn-outline-danger"
-                                                (click)="$event.stopPropagation()" (click)="selecionarRedeParaExcluir(item)" data-bs-toggle="modal"
+                                                (click)="$event.stopPropagation()"
+                                                (click)="selecionarRedeParaExcluir(item)" data-bs-toggle="modal"
                                                 data-bs-target="#modalConfirmarExcluirRede">
                                                 Excluir
                                             </button>
@@ -107,8 +109,12 @@
                         <div class="empty-title">Pronto para mapear</div>
                         <div class="empty-sub">Selecione uma rede na lista ou cadastre uma nova.</div>
 
-                        <button class="btn btn-outline-primary mt-2" (click)="mapearRede()" [disabled]="!redeSelecionadaParaMapear">
-                            Iniciar mapeamento
+                        <button class="btn btn-outline-primary mt-2" (click)="mapearRede()"
+                            [disabled]="!redeSelecionadaParaMapear || mapeandoRede()">
+
+                            <span *ngIf="!mapeandoRede()">Iniciar mapeamento</span>
+                            <span *ngIf="mapeandoRede()">Mapeando...</span>
+
                         </button>
                     </div>
                 </div>
@@ -135,7 +141,7 @@
                         <div class="device-list p-3">
 
 
-                            <div class="device-item" *ngFor="let d of dispositivosEncontrados()"
+                            <div class="device-item" *ngFor="let d of dispositivosEncontrados(); let i = index"
                                 [class.device-error]="d.Status !== 'SUCESSO'">
 
                                 <div class="device-main">
@@ -148,8 +154,8 @@
                                     <!-- Linha secundária -->
                                     <div class="device-sub">
                                         IP: {{ d.ip }}
-                                        <span *ngIf="d.ssid"> • SSID: {{ d.ssid }} • </span>
-                                        Canal: {{d.canalRadio}}
+                                        <span *ngIf="d.ssid"> • SSID: {{ d.ssid }}</span>
+                                        <span *ngIf="d.canalRadio"> • Canal: {{ d.canalRadio }}</span>
                                     </div>
 
                                     <!-- sinal -->
@@ -170,7 +176,7 @@
 
                                 <!-- botão adicionar só se Status for OK -->
                                 <button *ngIf="d.Status !== 'SUCESSO'" class="icon-btn add" type="button"
-                                    (click)="adicionarDispositivo(d)" title="Adicionar dispositivo">
+                                    (click)="mapearDispositivo(d, i)" title="Adicionar dispositivo">
                                     <i class="bi bi-arrow-clockwise"></i>
                                 </button>
                             </div>
@@ -232,7 +238,8 @@
                                     </button>
 
                                     <!-- Botão escondido só para fechar via TS -->
-                                    <button #btnCloseAddRede type="button" class="d-none" data-bs-dismiss="modal"></button>
+                                    <button #btnCloseAddRede type="button" class="d-none"
+                                        data-bs-dismiss="modal"></button>
                                 </div>
 
                             </form>

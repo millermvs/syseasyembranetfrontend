@@ -21,6 +21,7 @@ export class Redes {
   pageSize = 20;              // itens por página
   redesPage = signal<any | null>(null);
   dispositivosEncontrados = signal<any[]>([]);
+  mapeandoRede = signal(false);
   @ViewChild('btnCloseAddRede')     // fechar modal
   btnCloseAddRede!: ElementRef<HTMLButtonElement>; // fechar modal
 
@@ -113,11 +114,26 @@ export class Redes {
   }
 
   mapearRede() {
-    this.http.post<any[]>(`http://localhost:8080/api/v1/redes/mapear/${this.redeSelecionadaParaMapear.idRede}`, {})
-      .subscribe(response => {
+
+    if (!this.redeSelecionadaParaMapear) return;
+
+    this.mapeandoRede.set(true); // começa o loading
+
+    this.http.post<any[]>(`http://localhost:8080/api/v1/redes/mapear/${this.redeSelecionadaParaMapear.idRede}`, {}).subscribe({
+      next: (response) => {
         this.dispositivosEncontrados.set(response);
-        this.redeSelecionadaParaMapear = null; // limpa a seleção após o mapeamento
-      });
+        this.mapeandoRede.set(false); // termina loading
+        this.consultarRedes(0);
+        this.mensagemPagPrincipal.set("Mapeamento da rede " + this.redeSelecionadaParaMapear.rede + " concluído com sucesso!");
+        this.tipoMensagem.set("success");
+        setTimeout(() => this.mensagemPagPrincipal.set(''), 4000);
+        this.redeSelecionadaParaMapear = null;
+      },
+      error: (error) => {
+        console.error(error);
+        this.mapeandoRede.set(false); // termina loading mesmo se der erro
+      }
+    });
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,11 +164,50 @@ export class Redes {
     });
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////MetodoAddDispositivo////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////MetodoMapearUnicoDispositivo////////////////////////////////////////
 
-  adicionarDispositivo(d: any) {
-    console.log("Adicionar:", d);
-    // aqui depois chama sua API de salvar
+  mapearDispositivo(d: any, index: number) {
+    // 1) marca o item como "mapeando" pra feedback visual
+    this.dispositivosEncontrados.update(lista => {
+      const nova = [...lista];
+      nova[index] = {
+        ...nova[index],
+        Status: 'MAPEANDO...'
+      };
+      return nova;
+    });
+
+    this.http.post<any>(
+      `http://localhost:8080/api/v1/equipamentos/mapear/${d.ip}`,
+      ''
+    ).subscribe({
+      next: (response: any) => {
+        // 2) sucesso: substitui o item do index pela resposta
+        this.dispositivosEncontrados.update(lista => {
+          const nova = [...lista];
+          nova[index] = response; // troca o item inteiro
+          return nova;          
+        });
+        this.consultarRedes(0);
+      },
+
+      error: (error: any) => {
+        // 3) erro: mantém o item, só troca a mensagem/Status
+        const msg =
+          error?.error?.message ||
+          error?.message ||
+          'Falha ao mapear dispositivo';
+
+        this.dispositivosEncontrados.update(lista => {
+          const nova = [...lista];
+          nova[index] = {
+            ...nova[index],          // mantém o que já tinha (ip, etc.)
+            Status: msg,             // atualiza a mensagem que já mostra na tela
+          };
+          return nova;
+        });
+      }
+    });
   }
 }
