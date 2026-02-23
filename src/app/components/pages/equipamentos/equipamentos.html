@@ -1,1 +1,194 @@
-<p>equipamentos works!</p>
+<div class="container-fluid">
+
+    <!-- TÍTULO + BOTÃO -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="mb-0">Equipamentos</h2>
+            <small class="text-muted">Gerencie os equipamentos cadastrados</small>
+        </div>
+
+        <div class="col-auto">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAddEquipamento">
+                + Novo Equipamento
+            </button>
+        </div>
+    </div>
+
+    <!-- ALERTA -->
+    <div *ngIf="mensagemPagPrincipal() != ''" class="alert alert-{{tipoMensagem()}} alert-dismissible fade show">
+        <strong>{{ mensagemPagPrincipal() }}</strong>
+        <button type="button" class="btn-close" (click)="mensagemPagPrincipal.set('')"></button>
+    </div>
+
+    <!-- CARD LISTAGEM -->
+    <div class="card box-card">
+        <div class="card-header box-header text-center">
+            <div class="row align-items-center">
+                <div class="col text-center">
+                    <span class="fw-bold fs-5">Equipamentos cadastrados</span>
+                </div>
+
+                <!-- Campo de pesquisa -->
+                <div class="col-auto d-flex align-items-center">
+                    <form class="d-flex" [formGroup]="formPesquisarEquipamento" (ngSubmit)="pesquisarEquipamento()">
+
+                        <input type="text" class="form-control search-input" formControlName="ipPesquisa"
+                            placeholder="Pesquisar por IP...">
+
+                        <button type="submit" class="btn btn-outline-primary ms-2" *ngIf="!ativarBodyPesquisa()"
+                        [disabled]="formPesquisarEquipamento.invalid || !formPesquisarEquipamento.get('ipPesquisa')?.value">
+                            <i class="bi bi-search"></i>
+                        </button>
+
+                    </form>
+                    <button class="btn-icon-search ms-2" type="button" *ngIf="ativarBodyPesquisa()">
+                        <i class="bi bi-x fs-3"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-scroll">
+                <table class="table table-sm mb-0 align-middle redes-table">
+                    <thead class="thead-brand">
+                        <tr>
+                            <th>IP</th>
+                            <th>Nome</th>
+                            <th>SSID</th>
+                            <th>Sinal</th>
+                            <th>Canal</th>
+                            <th>MAC</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let item of equipamentosPage()?.content; trackBy: trackByEquipamento">
+                            <td class="fw-semibold">{{ item.ip }}</td>
+                            <td>{{ item.nomeRadio }}</td>
+                            <td>{{ item.ssid }}</td>
+                            <td>{{ item.nivelDeSinal }}</td>
+                            <td>{{ item.canalRadio }}</td>
+                            <td>{{ item.mac }}</td>
+                        </tr>
+
+                        <tr *ngIf="equipamentosPage() && equipamentosPage()?.content?.length === 0">
+                            <td colspan="6" class="text-center text-muted py-3">
+                                Nenhum equipamento cadastrado.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer box-footer d-flex align-items-center justify-content-between">
+            <small class="text-muted">
+                Total: <strong>{{ equipamentosPage()?.totalElements ?? 0 }}</strong>
+            </small>
+
+            <div class="d-flex gap-2">
+                <small class="text-muted">
+                    Página {{ (equipamentosPage()?.number ?? 0) + 1 }}
+                    de {{ equipamentosPage()?.totalPages ?? 1 }}
+                </small>
+
+                <button class="btn btn-sm btn-outline-secondary"
+                    (click)="irParaPagina((equipamentosPage()?.number ?? 0) - 1)"
+                    [disabled]="equipamentosPage()?.first">
+                    ←
+                </button>
+
+                <button class="btn btn-sm btn-outline-secondary"
+                    (click)="irParaPagina((equipamentosPage()?.number ?? 0) + 1)" [disabled]="equipamentosPage()?.last">
+                    →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ADD -->
+    <div class="modal fade" id="modalAddEquipamento" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title w-100 text-center">Cadastrar Equipamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="text-center">
+                        <button class="btn btn-outline-primary mt-2" (click)="buscarInfoViaSNMP()"
+                            [disabled]="formAddEquipamento.invalid">
+                            <span *ngIf="!mapeandoEquipamento()">Buscar informações via SNMP</span>
+                            <span *ngIf="mapeandoEquipamento()">Mapeando equipamento...</span>
+                        </button>
+                    </div>
+                    <form [formGroup]="formAddEquipamento" (ngSubmit)="adicionarEquipamento()">
+
+                        <div class="mb-2">
+                            <label class="form-label">IP</label>
+                            <input class="form-control" formControlName="ip"
+                                placeholder="Digite o IP e busque via SNMP ↑">
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">MAC</label>
+                            <input class="form-control" formControlName="mac">
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Nome Rádio</label>
+                            <input class="form-control" formControlName="nomeRadio">
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">SSID</label>
+                            <input class="form-control" formControlName="ssid">
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Nível de Sinal</label>
+                            <input class="form-control" formControlName="nivelDeSinal">
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Canal</label>
+                            <input class="form-control" formControlName="canalRadio">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">MAC do AP</label>
+                            <input class="form-control" formControlName="macDoAp">
+                        </div>
+
+                        <div *ngIf="mensagemModal() != ''"
+                            class="alert alert-{{tipoMensagem()}} alert-dismissible fade show">
+                            <strong>{{ mensagemModal() }}</strong>
+                            <button type="button" class="btn-close" (click)="mensagemModal.set('')"></button>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+
+                            <button type="submit" class="btn btn-primary" [disabled]="formAddEquipamento.invalid">
+                                Adicionar
+                            </button>
+
+                            <button #btnCloseAddEquipamento type="button" class="d-none"
+                                data-bs-dismiss="modal"></button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
