@@ -36,7 +36,7 @@
                             placeholder="Pesquisar por IP...">
 
                         <button type="submit" class="btn btn-outline-primary ms-2" *ngIf="!ativarBodyPesquisa()"
-                        [disabled]="formPesquisarEquipamento.invalid || !formPesquisarEquipamento.get('ipPesquisa')?.value">
+                            [disabled]="formPesquisarEquipamento.invalid || !formPesquisarEquipamento.get('ipPesquisa')?.value">
                             <i class="bi bi-search"></i>
                         </button>
 
@@ -59,6 +59,8 @@
                             <th>Sinal</th>
                             <th>Canal</th>
                             <th>MAC</th>
+                            <th><i class="bi bi-pencil-square"></i></th>
+                            <th><i class="bi bi-trash"></i></th>
                         </tr>
                     </thead>
 
@@ -70,6 +72,15 @@
                             <td>{{ item.nivelDeSinal }}</td>
                             <td>{{ item.canalRadio }}</td>
                             <td>{{ item.mac }}</td>
+                            <td>
+                                <i class="bi bi-pencil-square action-icon edit-icon" data-bs-toggle="modal"
+                                    data-bs-target="#modalEditarEquipamento"
+                                    (click)="abrirModalEditarEquipamento(item)"></i>
+                            </td>
+
+                            <td>
+                                <i class="bi bi-trash action-icon delete-icon" (click)="deletarEquipamento(item)"></i>
+                            </td>
                         </tr>
 
                         <tr *ngIf="equipamentosPage() && equipamentosPage()?.content?.length === 0">
@@ -107,69 +118,87 @@
         </div>
     </div>
 
-    <!-- MODAL ADD -->
+    <!-- ----------------------------------------------------------------------------------------------------------- -->
+    <!-- -----------------------------------------MODAL DE ADD EQUIPAMENTO----------------------------------------- -->
+    <!-- ----------------------------------------------------------------------------------------------------------- -->
     <div class="modal fade" id="modalAddEquipamento" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
 
+                <!-- Cabeçalho -->
                 <div class="modal-header">
                     <h5 class="modal-title w-100 text-center">Cadastrar Equipamento</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
+                <!-- Corpo -->
                 <div class="modal-body">
 
+                    <!-- Botão Buscar via SNMP -->
                     <div class="text-center">
-                        <button class="btn btn-outline-primary mt-2" (click)="buscarInfoViaSNMP()"
+                        <button class="btn btn-outline-primary mt-2" (click)="addBuscarInfoViaSNMP()"
                             [disabled]="formAddEquipamento.invalid">
+
                             <span *ngIf="!mapeandoEquipamento()">Buscar informações via SNMP</span>
                             <span *ngIf="mapeandoEquipamento()">Mapeando equipamento...</span>
+
                         </button>
                     </div>
+
+                    <!-- Formulário -->
                     <form [formGroup]="formAddEquipamento" (ngSubmit)="adicionarEquipamento()">
 
+                        <!-- IP -->
                         <div class="mb-2">
                             <label class="form-label">IP</label>
                             <input class="form-control" formControlName="ip"
                                 placeholder="Digite o IP e busque via SNMP ↑">
                         </div>
 
+                        <!-- MAC -->
                         <div class="mb-2">
                             <label class="form-label">MAC</label>
                             <input class="form-control" formControlName="mac">
                         </div>
 
+                        <!-- Nome Rádio -->
                         <div class="mb-2">
                             <label class="form-label">Nome Rádio</label>
                             <input class="form-control" formControlName="nomeRadio">
                         </div>
 
+                        <!-- SSID -->
                         <div class="mb-2">
                             <label class="form-label">SSID</label>
                             <input class="form-control" formControlName="ssid">
                         </div>
 
+                        <!-- Nível de Sinal -->
                         <div class="mb-2">
                             <label class="form-label">Nível de Sinal</label>
                             <input class="form-control" formControlName="nivelDeSinal">
                         </div>
 
+                        <!-- Canal -->
                         <div class="mb-2">
                             <label class="form-label">Canal</label>
                             <input class="form-control" formControlName="canalRadio">
                         </div>
 
+                        <!-- MAC do AP -->
                         <div class="mb-3">
                             <label class="form-label">MAC do AP</label>
                             <input class="form-control" formControlName="macDoAp">
                         </div>
 
+                        <!-- Mensagem retorno -->
                         <div *ngIf="mensagemModal() != ''"
                             class="alert alert-{{tipoMensagem()}} alert-dismissible fade show">
                             <strong>{{ mensagemModal() }}</strong>
                             <button type="button" class="btn-close" (click)="mensagemModal.set('')"></button>
                         </div>
 
+                        <!-- Rodapé -->
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
                                 Cancelar
@@ -179,16 +208,113 @@
                                 Adicionar
                             </button>
 
-                            <button #btnCloseAddEquipamento type="button" class="d-none"
+                            <!-- Botão escondido só para fechar via TS -->
+                            <button #btnCloseAddEquipamento type="button" class="d-none" data-bs-dismiss="modal">
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ----------------------------------------------------------------------------------------------------------- -->
+    <!-- -----------------------------------------MODAL DE EDICAO EQUIPAMENTO--------------------------------------- -->
+    <!-- ----------------------------------------------------------------------------------------------------------- -->
+    <div class="modal fade" id="modalEditarEquipamento" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Cabeçalho -->
+                <div class="modal-header">
+                    <h5 class="modal-title t text-center w-100">Editar Equipamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Botão Buscar via SNMP -->
+                <div class="text-center">
+                    <button class="btn btn-outline-primary mt-2" (click)="editBuscarInfoViaSNMP()"
+                        [disabled]="formEditEquipamento.invalid">
+
+                        <span *ngIf="!mapeandoEquipamento()">Buscar informações via SNMP</span>
+                        <span *ngIf="mapeandoEquipamento()">Mapeando equipamento...</span>
+
+                    </button>
+                </div>
+
+                <!-- Corpo -->
+                <div class="modal-body">
+                    <form [formGroup]="formEditEquipamento" (ngSubmit)="editarEquipamento()">
+
+                        <!-- IP (normalmente não edita) -->
+                        <div class="mb-2">
+                            <label class="form-label">IP</label>
+                            <input class="form-control" formControlName="ip" readonly>
+                            <small class="text-muted">IP não pode ser alterado.</small>
+                        </div>
+
+                        <!-- MAC -->
+                        <div class="mb-2">
+                            <label class="form-label">MAC</label>
+                            <input class="form-control" formControlName="mac">
+                        </div>
+
+                        <!-- Nome Rádio -->
+                        <div class="mb-2">
+                            <label class="form-label">Nome Rádio</label>
+                            <input class="form-control" formControlName="nomeRadio">
+                        </div>
+
+                        <!-- SSID -->
+                        <div class="mb-2">
+                            <label class="form-label">SSID</label>
+                            <input class="form-control" formControlName="ssid">
+                        </div>
+
+                        <!-- Nível de Sinal -->
+                        <div class="mb-2">
+                            <label class="form-label">Nível de Sinal</label>
+                            <input class="form-control" formControlName="nivelDeSinal">
+                        </div>
+
+                        <!-- Canal -->
+                        <div class="mb-2">
+                            <label class="form-label">Canal</label>
+                            <input class="form-control" formControlName="canalRadio">
+                        </div>
+
+                        <!-- MAC do AP -->
+                        <div class="mb-3">
+                            <label class="form-label">MAC do AP</label>
+                            <input class="form-control" formControlName="macDoAp">
+                        </div>
+
+                        <!-- Mensagem retorno -->
+                        <div *ngIf="mensagemModal() != ''"
+                            class="alert alert-{{tipoMensagem()}} alert-dismissible fade show">
+                            <strong>{{ mensagemModal() }}</strong>
+                            <button type="button" class="btn-close" (click)="mensagemModal.set('')"></button>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+
+                            <button type="submit" class="btn btn-primary"
+                                [disabled]="formEditEquipamento.pristine || formEditEquipamento.invalid">
+                                Salvar
+                            </button>
+
+                            <!-- Botão escondido só para fechar via TS -->
+                            <button #btnCloseEditEquipamento type="button" class="d-none"
                                 data-bs-dismiss="modal"></button>
                         </div>
 
                     </form>
-
                 </div>
 
             </div>
         </div>
     </div>
-
-</div>

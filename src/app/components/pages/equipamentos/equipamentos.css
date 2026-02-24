@@ -309,3 +309,21 @@ input::placeholder {
 .btn-icon-search:active {
   transform: scale(0.96);
 }
+
+.action-icon {
+  cursor: pointer;
+  font-size: 18px;
+  transition: 0.2s ease-in-out;
+}
+
+/* EDITAR */
+.edit-icon:hover {
+  color: #0d6efd; /* primary */
+  transform: scale(1.15);
+}
+
+/* EXCLUIR */
+.delete-icon:hover {
+  color: #dc3545; /* vermelho bootstrap */
+  transform: scale(1.15);
+}
