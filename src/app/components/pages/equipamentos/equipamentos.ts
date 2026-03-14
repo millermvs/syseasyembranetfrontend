@@ -82,7 +82,7 @@ export class Equipamentos {
   });
 
   adicionarEquipamento() {
-    this.http.post(`http://localhost:8080/api/v1/equipamentos/cadastrar`, this.formAddEquipamento.value)
+    this.http.post(`http://192.168.100.50:8080/api/v1/equipamentos/cadastrar`, this.formAddEquipamento.value)
       .subscribe({
         next: (response: any) => {
           this.mensagemPagPrincipal.set("Equipamento " + response.ip + " cadastrado com sucesso!");
@@ -105,7 +105,7 @@ export class Equipamentos {
 
     this.mapeandoEquipamento.set(true); // começa o loading
 
-    this.http.get<any>(`http://localhost:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
+    this.http.get<any>(`http://192.168.100.50:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
       next: (response: any) => {
         this.mapeandoEquipamento.set(false); // termina o loading
         // preenche o formulário com o que veio do backend
@@ -189,7 +189,7 @@ export class Equipamentos {
       macDoAp: this.formEditEquipamento.get('macDoAp')?.value,
     };
 
-    this.http.put(`http://localhost:8080/api/v1/equipamentos/editar?id=${id}`, payload).subscribe({
+    this.http.put(`http://192.168.100.50:8080/api/v1/equipamentos/editar?id=${id}`, payload).subscribe({
       next: () => {
         this.mensagemPagPrincipal.set("Equipamento " + ip + " editado com sucesso!");
         this.tipoMensagem.set("success");
@@ -214,7 +214,7 @@ export class Equipamentos {
 
     this.mapeandoEquipamento.set(true); // começa o loading
 
-    this.http.get<any>(`http://localhost:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
+    this.http.get<any>(`http://192.168.100.50:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
       next: (response: any) => {
         this.mapeandoEquipamento.set(false); // termina o loading
         // preenche o formulário com o que veio do backend
@@ -249,7 +249,7 @@ export class Equipamentos {
   ///////////////////////////////////////////ConsultarEquipamento///////////////////////////////////////////////
 
   consultarEquipamentos(pagina = 0) {
-    const url = `http://localhost:8080/api/v1/equipamentos/listar?page=${pagina}&size=${this.pageSize}`;
+    const url = `http://192.168.100.50:8080/api/v1/equipamentos/listar?page=${pagina}&size=${this.pageSize}`;
 
     this.http.get<any>(url).subscribe({
       next: (page) => {

@@ -43,7 +43,7 @@ export class Redes {
   });
 
   consultarRedes(pagina = 0) {
-    const url = `http://localhost:8080/api/v1/redes/listar?page=${pagina}&size=${this.pageSize}`;
+    const url = `http://192.168.100.50:8080/api/v1/redes/listar?page=${pagina}&size=${this.pageSize}`;
 
     this.http.get<any>(url).subscribe({
       next: (page) => {
@@ -82,7 +82,7 @@ export class Redes {
   //////////////////////////////////////////MetodoAddRede//////////////////////////////////////////
 
   adcionarRede() {
-    this.http.post(`http://localhost:8080/api/v1/redes/cadastrar`, this.formAddRede.value).subscribe({
+    this.http.post(`http://192.168.100.50:8080/api/v1/redes/cadastrar`, this.formAddRede.value).subscribe({
       next: (response: any) => {
         this.mensagemPagPrincipal.set("Rede " + response.rede + " cadastrada com sucesso!");
         this.tipoMensagem.set("success");
@@ -119,7 +119,7 @@ export class Redes {
 
     this.mapeandoRede.set(true); // começa o loading
 
-    this.http.post<any[]>(`http://localhost:8080/api/v1/redes/mapear/${this.redeSelecionadaParaMapear.idRede}`, {}).subscribe({
+    this.http.post<any[]>(`http://192.168.100.50:8080/api/v1/redes/mapear/${this.redeSelecionadaParaMapear.idRede}`, {}).subscribe({
       next: (response) => {
         this.dispositivosEncontrados.set(response);
         this.mapeandoRede.set(false); // termina loading
@@ -148,7 +148,7 @@ export class Redes {
   excluirRede() {
     if (!this.redeSelecionadaParaExcluir) return;
 
-    this.http.delete(`http://localhost:8080/api/v1/redes/excluir?id=${this.redeSelecionadaParaExcluir.idRede}`).subscribe({
+    this.http.delete(`http://192.168.100.50:8080/api/v1/redes/excluir?id=${this.redeSelecionadaParaExcluir.idRede}`).subscribe({
       next: (response: any) => {
         this.mensagemPagPrincipal.set("Rede " + response.rede + " excluída com sucesso!");
         this.tipoMensagem.set("success");
@@ -179,7 +179,7 @@ export class Redes {
     });
 
     this.http.post<any>(
-      `http://localhost:8080/api/v1/equipamentos/mapear/${d.ip}`,
+      `http://192.168.100.50:8080/api/v1/equipamentos/mapear/${d.ip}`,
       ''
     ).subscribe({
       next: (response: any) => {
