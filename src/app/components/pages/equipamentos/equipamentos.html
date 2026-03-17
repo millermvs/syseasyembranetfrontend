@@ -55,6 +55,7 @@
                         <tr>
                             <th>IP</th>
                             <th>Nome</th>
+                            <th>Model</th>
                             <th>SSID</th>
                             <th>Sinal</th>
                             <th>Canal</th>
@@ -68,6 +69,7 @@
                         <tr *ngFor="let item of equipamentosPage()?.content; trackBy: trackByEquipamento">
                             <td class="fw-semibold">{{ item.ip }}</td>
                             <td>{{ item.nomeRadio }}</td>
+                            <td>{{ item.modeloDoRadio }}</td>
                             <td>{{ item.ssid }}</td>
                             <td>{{ item.nivelDeSinal }}</td>
                             <td>{{ item.canalRadio }}</td>
@@ -191,6 +193,12 @@
                             <input class="form-control" formControlName="macDoAp">
                         </div>
 
+                        <!-- Modelo do Radio -->
+                        <div class="mb-3">
+                            <label class="form-label">Modelo do Rádio</label>
+                            <input class="form-control" formControlName="modeloDoRadio">
+                        </div>
+
                         <!-- Mensagem retorno -->
                         <div *ngIf="mensagemModal() != ''"
                             class="alert alert-{{tipoMensagem()}} alert-dismissible fade show">
@@ -288,6 +296,13 @@
                             <label class="form-label">MAC do AP</label>
                             <input class="form-control" formControlName="macDoAp">
                         </div>
+
+                        <!-- Modelo do Rádio -->
+                        <div class="mb-3">
+                            <label class="form-label">Modelo do Rádio</label>
+                            <input class="form-control" formControlName="modeloDoRadio">
+                        </div>
+                        
 
                         <!-- Mensagem retorno -->
                         <div *ngIf="mensagemModal() != ''"

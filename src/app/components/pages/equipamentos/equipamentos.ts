@@ -39,7 +39,8 @@ export class Equipamentos {
         ssid: '',
         nivelDeSinal: '',
         canalRadio: '',
-        macDoAp: ''
+        macDoAp: '',
+        modeloDoRadio: ''
       });
 
       // limpa mensagens do modal também
@@ -79,10 +80,11 @@ export class Equipamentos {
     nivelDeSinal: [''],
     canalRadio: [''],
     macDoAp: [''],
+    modeloDoRadio: ['']
   });
 
   adicionarEquipamento() {
-    this.http.post(`http://192.168.100.50:8080/api/v1/equipamentos/cadastrar`, this.formAddEquipamento.value)
+    this.http.post(`http://localhost:8080/api/v1/equipamentos/cadastrar`, this.formAddEquipamento.value)
       .subscribe({
         next: (response: any) => {
           this.mensagemPagPrincipal.set("Equipamento " + response.ip + " cadastrado com sucesso!");
@@ -105,7 +107,7 @@ export class Equipamentos {
 
     this.mapeandoEquipamento.set(true); // começa o loading
 
-    this.http.get<any>(`http://192.168.100.50:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
+    this.http.get<any>(`http://localhost:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
       next: (response: any) => {
         this.mapeandoEquipamento.set(false); // termina o loading
         // preenche o formulário com o que veio do backend
@@ -117,6 +119,7 @@ export class Equipamentos {
           nivelDeSinal: response.nivelDeSinal ?? '',
           canalRadio: response.canalRadio ?? '',
           macDoAp: response.macDoAp ?? '',
+          modeloDoRadio: response.modeloDoRadio ?? ''
         });
 
         // opcional: mensagens no modal
@@ -146,6 +149,7 @@ export class Equipamentos {
     nivelDeSinal: [''],
     canalRadio: [''],
     macDoAp: [''],
+    modeloDoRadio: ['']
   });
 
   equipamentoSelecionadoParaEditar: any = null;
@@ -164,6 +168,8 @@ export class Equipamentos {
       nivelDeSinal: equip.nivelDeSinal,
       canalRadio: equip.canalRadio,
       macDoAp: equip.macDoAp,
+      modeloDoRadio: equip.modeloDoRadio
+
     });
 
     // força o estado inicial como pristine
@@ -187,9 +193,10 @@ export class Equipamentos {
       nivelDeSinal: this.formEditEquipamento.get('nivelDeSinal')?.value,
       canalRadio: this.formEditEquipamento.get('canalRadio')?.value,
       macDoAp: this.formEditEquipamento.get('macDoAp')?.value,
+      modeloDoRadio: this.formEditEquipamento.get('modeloDoRadio')?.value
     };
 
-    this.http.put(`http://192.168.100.50:8080/api/v1/equipamentos/editar?id=${id}`, payload).subscribe({
+    this.http.put(`http://localhost:8080/api/v1/equipamentos/editar?id=${id}`, payload).subscribe({
       next: () => {
         this.mensagemPagPrincipal.set("Equipamento " + ip + " editado com sucesso!");
         this.tipoMensagem.set("success");
@@ -214,7 +221,7 @@ export class Equipamentos {
 
     this.mapeandoEquipamento.set(true); // começa o loading
 
-    this.http.get<any>(`http://192.168.100.50:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
+    this.http.get<any>(`http://localhost:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
       next: (response: any) => {
         this.mapeandoEquipamento.set(false); // termina o loading
         // preenche o formulário com o que veio do backend
@@ -226,6 +233,7 @@ export class Equipamentos {
           nivelDeSinal: response.nivelDeSinal ?? '',
           canalRadio: response.canalRadio ?? '',
           macDoAp: response.macDoAp ?? '',
+          modeloDoRadio: response.modeloDoRadio ?? ''
         });
 
         // opcional: mensagens no modal
@@ -249,7 +257,7 @@ export class Equipamentos {
   ///////////////////////////////////////////ConsultarEquipamento///////////////////////////////////////////////
 
   consultarEquipamentos(pagina = 0) {
-    const url = `http://192.168.100.50:8080/api/v1/equipamentos/listar?page=${pagina}&size=${this.pageSize}`;
+    const url = `http://localhost:8080/api/v1/equipamentos/listar?page=${pagina}&size=${this.pageSize}`;
 
     this.http.get<any>(url).subscribe({
       next: (page) => {
