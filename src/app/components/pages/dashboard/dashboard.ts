@@ -4,6 +4,7 @@ import { Navbar } from '../../shared/navbar/navbar';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 
 
@@ -34,10 +35,9 @@ export class Dashboard {
   idClinica = 1;
 
   // Totais (cards)
-  totalMedicos = signal<number>(0);
-  totalPacientes = signal<number>(0);
-  totalConsultasHoje = signal<number>(0);
-  totalConsultasMes = signal<number>(0);
+  totalRedes = signal<number>(0);
+  totalEquipamentos = signal<number>(0);
+  
 
   // Mensagens
   mensagemMedicos = signal<string>('');
@@ -70,94 +70,59 @@ export class Dashboard {
 
   
   ngOnInit() {
-    this.carregarTotalMedicosCard();
-    this.consultarPacientes();
-    this.buscarConsultasHoje();
-    this.buscarConsultasMes();
-
-    this.carregarMedicosAtivosSelect();
-    this.buscarListaConsultasDoDia();
-    this.buscarQuantidadeConsultasPorMedicoMes();
-
-    this.formFiltroConsultas.get('idMedico')?.valueChanges.subscribe(() => {
-      this.buscarListaConsultasDoDia();
-    });
+    this.consultarRedes();
+    this.consultarEquipamentos();
   }
 
   // =======================
   // CARDS
   // =======================
 
-  carregarTotalMedicosCard() {
-   
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////ConsultarRedes///////////////////////////////////////////////
+  consultarRedes(pagina = 0) {
+      const url = `${environment.api.listarRedes}?page=${pagina}&size=1`;
+  
+      this.http.get<any>(url).subscribe({
+        next: (page) => {
+          this.totalRedes.set(page.totalElements);
+          //this.paginaAtual.set(page.number);
+        },
+        error: (e) => console.log(e)
+      });
+    }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////ConsultarEquipamento///////////////////////////////////////////////
+
+  consultarEquipamentos(pagina = 0) {
+    const url = `${environment.api.listarEquipamentos}?page=${pagina}&size=1`;
+
+    this.http.get<any>(url).subscribe({
+      next: (page) => {
+        this.totalEquipamentos.set(page.totalElements);
+        
+      },error: (e) => console.log(e)
+    });
   }
 
-  private readonly endPointPacientes = ``;
 
-  consultarPacientes() {
+  // =======================
+  // SELECT 
+  // =======================
+  carregarRedes() {
     
   }
 
-  private endpointBaseConsultasHoje = ``;
-
-  buscarConsultasHoje() {
-    const url = `${this.endpointBaseConsultasHoje}/${this.dataHoje}/${this.dataHoje}?page=0&size=1`;
-    this.http.get(url).subscribe({
-      next: (response: any) => this.totalConsultasHoje.set(response.totalElements),
-      error: (e: any) => this.mensagemConsultasHoje.set((e.error?.message ? e.error.message + ' para hoje.' : '') || 'erro 1.')
-    });
-  }
-
-  private endpointBaseConsultasMes = ``;
-
-  buscarConsultasMes() {
-    const url = `${this.endpointBaseConsultasMes}/${this.primeiroDia}/${this.ultimoDia}?page=0&size=1`;
-    this.http.get(url).subscribe({
-      next: (response: any) => this.totalConsultasMes.set(response.totalElements),
-      error: (e: any) => this.mensagemConsultasMes.set((e.error?.message ? e.error.message + ' para este mês.' : '') || 'erro 2.')
-    });
-  }
-
   // =======================
-  // SELECT MÉDICOS
+  // LISTA REDE
   // =======================
-  carregarMedicosAtivosSelect() {
-    
-  }
-
-  // =======================
-  // LISTA CONSULTAS DO DIA
-  // =======================
-  buscarListaConsultasDoDia() {
-    const idMedico = this.formFiltroConsultas.get('idMedico')?.value;
-    const dataInicio = this.dataHoje;
-    const dataFim = this.dataHoje;
-
-    const urlData = ``;
-    const urlDataMedico = ``;
-
-    const url = (idMedico === '' || idMedico == null) ? urlData : urlDataMedico;
-
-    this.http.get(url).subscribe({
-      next: (response: any) => this.consultasHoje.set(response.content || response || []),
-      error: () => this.consultasHoje.set([])
-    });
-  }
+  
 
   // =======================
   // RESUMO DO GRÁFICO
   // =======================
-  buscarQuantidadeConsultasPorMedicoMes() {
-    const endpoint = ``;
-
-    this.http.get(endpoint).subscribe({
-      next: (response: any) => {
-        const lista = (response?.content ?? response ?? []) as ResumoConsultasPorMedico[];
-        this.quantidadeConsultasPorMedicoMes.set(Array.isArray(lista) ? lista : []);
-      },
-      error: () => this.quantidadeConsultasPorMedicoMes.set([])
-    });
-  }
+ 
 
   // =======================
   // FUNÇÕES PURAS DO GRÁFICO

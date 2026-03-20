@@ -113,14 +113,14 @@
                             [disabled]="!redeSelecionadaParaMapear || mapeandoRede()">
 
                             <span *ngIf="!mapeandoRede()">Iniciar mapeamento</span>
-                            <span *ngIf="mapeandoRede()">Mapeando...</span>
+                            <span *ngIf="mapeandoRede()">Mapeando, não saia desta tela...</span>
 
                         </button>
                     </div>
                 </div>
 
                 <div class="card-footer box-footer">
-                    <small class="text-muted">Aqui colocar progresso</small>
+                    <small class="text-muted">ATENÇÃO: O mapeamento pode levar alguns minutos para ser concluído, NÃO SAIA DESTA TELA ATÉ FINALIZAR!</small>
                 </div>
             </div>
         </div>
@@ -155,7 +155,11 @@
                                     <div class="device-sub">
                                         IP: {{ d.ip }}
                                         <span *ngIf="d.ssid"> • SSID: {{ d.ssid }}</span>
-                                        <span *ngIf="d.canalRadio"> • Canal: {{ d.canalRadio }} • Model: {{ d.modeloDoRadio }}</span>
+                                        <span *ngIf="d.canalRadio"> • Canal: {{ d.canalRadio }} </span>
+                                        
+                                    </div>
+                                    <div class="device-sub">
+                                        <span *ngIf="d.modeloDoRadio">Model: {{ d.modeloDoRadio }}</span>
                                     </div>
 
                                     <!-- sinal -->
@@ -174,9 +178,9 @@
 
                                 </div>
 
-                                <!-- botão adicionar só se Status for OK -->
+                                <!-- botão mapear só se Status for Falha -->
                                 <button *ngIf="d.Status !== 'SUCESSO'" class="icon-btn add" type="button"
-                                    (click)="mapearDispositivo(d, i)" title="Adicionar dispositivo">
+                                    (click)="mapearDispositivo(d, i)" title="Mapear dispositivo">
                                     <i class="bi bi-arrow-clockwise"></i>
                                 </button>
                             </div>

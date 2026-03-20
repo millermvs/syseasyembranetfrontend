@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-redes',
@@ -43,7 +44,7 @@ export class Redes {
   });
 
   consultarRedes(pagina = 0) {
-    const url = `http://localhost:8080/api/v1/redes/listar?page=${pagina}&size=${this.pageSize}`;
+    const url = `${environment.api.listarRedes}?page=${pagina}&size=${this.pageSize}`;
 
     this.http.get<any>(url).subscribe({
       next: (page) => {
@@ -82,7 +83,7 @@ export class Redes {
   //////////////////////////////////////////MetodoAddRede//////////////////////////////////////////
 
   adcionarRede() {
-    this.http.post(`http://localhost:8080/api/v1/redes/cadastrar`, this.formAddRede.value).subscribe({
+    this.http.post(`${environment.api.cadastrarRede}`, this.formAddRede.value).subscribe({
       next: (response: any) => {
         this.mensagemPagPrincipal.set("Rede " + response.rede + " cadastrada com sucesso!");
         this.tipoMensagem.set("success");
@@ -119,7 +120,7 @@ export class Redes {
 
     this.mapeandoRede.set(true); // começa o loading
 
-    this.http.post<any[]>(`http://localhost:8080/api/v1/redes/mapear/${this.redeSelecionadaParaMapear.idRede}`, {}).subscribe({
+    this.http.post<any[]>(`${environment.api.mapearRede}/${this.redeSelecionadaParaMapear.idRede}`, {}).subscribe({
       next: (response) => {
         this.dispositivosEncontrados.set(response);
         this.mapeandoRede.set(false); // termina loading
@@ -148,7 +149,7 @@ export class Redes {
   excluirRede() {
     if (!this.redeSelecionadaParaExcluir) return;
 
-    this.http.delete(`http://localhost:8080/api/v1/redes/excluir?id=${this.redeSelecionadaParaExcluir.idRede}`).subscribe({
+    this.http.delete(`${environment.api.excluirRede}?id=${this.redeSelecionadaParaExcluir.idRede}`).subscribe({
       next: (response: any) => {
         this.mensagemPagPrincipal.set("Rede " + response.rede + " excluída com sucesso!");
         this.tipoMensagem.set("success");
@@ -177,37 +178,36 @@ export class Redes {
       };
       return nova;
     });
+    console.log(`${environment.api.mapearEquipamento}/${d.ip}`);
 
-    this.http.post<any>(
-      `http://localhost:8080/api/v1/equipamentos/mapear/${d.ip}`,
-      ''
-    ).subscribe({
-      next: (response: any) => {
-        // 2) sucesso: substitui o item do index pela resposta
-        this.dispositivosEncontrados.update(lista => {
-          const nova = [...lista];
-          nova[index] = response; // troca o item inteiro
-          return nova;          
-        });
-        this.consultarRedes(0);
-      },
+    this.http.get<any>(`${environment.api.mapearEquipamento}/${d.ip}`)
+      .subscribe({
+        next: (response: any) => {
+          // 2) sucesso: substitui o item do index pela resposta
+          this.dispositivosEncontrados.update(lista => {
+            const nova = [...lista];
+            nova[index] = response; // troca o item inteiro
+            return nova;
+          });
+          this.consultarRedes(0);
+        },
 
-      error: (error: any) => {
-        // 3) erro: mantém o item, só troca a mensagem/Status
-        const msg =
-          error?.error?.message ||
-          error?.message ||
-          'Falha ao mapear dispositivo';
+        error: (error: any) => {
+          // 3) erro: mantém o item, só troca a mensagem/Status
+          const msg =
+            error?.error?.message ||
+            error?.message ||
+            'Falha ao mapear dispositivo';
 
-        this.dispositivosEncontrados.update(lista => {
-          const nova = [...lista];
-          nova[index] = {
-            ...nova[index],          // mantém o que já tinha (ip, etc.)
-            Status: msg,             // atualiza a mensagem que já mostra na tela
-          };
-          return nova;
-        });
-      }
-    });
+          this.dispositivosEncontrados.update(lista => {
+            const nova = [...lista];
+            nova[index] = {
+              ...nova[index],          // mantém o que já tinha (ip, etc.)
+              Status: msg,             // atualiza a mensagem que já mostra na tela
+            };
+            return nova;
+          });
+        }
+      });
   }
 }

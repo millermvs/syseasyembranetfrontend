@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-equipamentos',
@@ -84,7 +85,7 @@ export class Equipamentos {
   });
 
   adicionarEquipamento() {
-    this.http.post(`http://localhost:8080/api/v1/equipamentos/cadastrar`, this.formAddEquipamento.value)
+    this.http.post(`${environment.api.cadastrarEquipamento}`, this.formAddEquipamento.value)
       .subscribe({
         next: (response: any) => {
           this.mensagemPagPrincipal.set("Equipamento " + response.ip + " cadastrado com sucesso!");
@@ -107,7 +108,7 @@ export class Equipamentos {
 
     this.mapeandoEquipamento.set(true); // começa o loading
 
-    this.http.get<any>(`http://localhost:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
+    this.http.get<any>(`${environment.api.mapearEquipamento}/${ip}`).subscribe({
       next: (response: any) => {
         this.mapeandoEquipamento.set(false); // termina o loading
         // preenche o formulário com o que veio do backend
@@ -196,7 +197,7 @@ export class Equipamentos {
       modeloDoRadio: this.formEditEquipamento.get('modeloDoRadio')?.value
     };
 
-    this.http.put(`http://localhost:8080/api/v1/equipamentos/editar?id=${id}`, payload).subscribe({
+    this.http.put(`${environment.api.editarEquipamento}?id=${id}`, payload).subscribe({
       next: () => {
         this.mensagemPagPrincipal.set("Equipamento " + ip + " editado com sucesso!");
         this.tipoMensagem.set("success");
@@ -221,7 +222,7 @@ export class Equipamentos {
 
     this.mapeandoEquipamento.set(true); // começa o loading
 
-    this.http.get<any>(`http://localhost:8080/api/v1/equipamentos/mapear/${ip}`).subscribe({
+    this.http.get<any>(`${environment.api.mapearEquipamento}/mapear/${ip}`).subscribe({
       next: (response: any) => {
         this.mapeandoEquipamento.set(false); // termina o loading
         // preenche o formulário com o que veio do backend
@@ -257,7 +258,7 @@ export class Equipamentos {
   ///////////////////////////////////////////ConsultarEquipamento///////////////////////////////////////////////
 
   consultarEquipamentos(pagina = 0) {
-    const url = `http://localhost:8080/api/v1/equipamentos/listar?page=${pagina}&size=${this.pageSize}`;
+    const url = `${environment.api.listarEquipamentos}?page=${pagina}&size=${this.pageSize}`;
 
     this.http.get<any>(url).subscribe({
       next: (page) => {
@@ -293,11 +294,6 @@ export class Equipamentos {
       });
     }
   }
-
-
-
-
-
 
   deletarEquipamento(equipamento: any) {
     if (!confirm(`Tem certeza que deseja deletar o equipamento ${equipamento.ip}?`)) {
