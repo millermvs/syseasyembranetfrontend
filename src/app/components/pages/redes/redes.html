@@ -37,8 +37,9 @@
                             <thead class="thead-brand">
                                 <tr>
                                     <th>Rede</th>
-                                    <th class="text-center" style="width: 120px;">Dispositivos</th>
-                                    <th class="text-center" style="width: 170px;">Ações</th>
+                                    <th class="text-center" style="width: 90px;">Modo</th>
+                                    <th class="text-center" style="width: 120px;">Equipamentos</th>
+                                    <th class="text-center" style="width: 170px;"><i class="bi bi-trash"></i></th>
                                 </tr>
                             </thead>
 
@@ -48,17 +49,19 @@
                                     [class.rede-selected]="redeSelecionadaParaMapear?.idRede === item.idRede">
 
                                     <td class="fw-semibold">{{ item.rede }}</td>
+                                    <td class="text-center">
+                                        <span class="badge"
+                                            [ngClass]="item.modoWireless === 'AP' ? 'bg-primary' : 'bg-warning text-dark'">
+                                            {{ item.modoWireless }}
+                                        </span>
+                                    </td>
                                     <td class="text-center">{{ item.totalEquipamentos }}</td>
 
                                     <td class="text-center">
-                                        <div class="acoes-wrap">
-                                            <button class="btn btn-sm btn-outline-danger"
-                                                (click)="$event.stopPropagation()"
-                                                (click)="selecionarRedeParaExcluir(item)" data-bs-toggle="modal"
-                                                data-bs-target="#modalConfirmarExcluirRede">
-                                                Excluir
-                                            </button>
-                                        </div>
+                                        <i class="bi bi-trash action-icon delete-icon" data-bs-toggle="modal"
+                                    data-bs-target="#modalConfirmarExcluirRede"
+                                    (click)="selecionarRedeParaExcluir(item)"></i>
+                                        
                                     </td>
                                 </tr>
 
@@ -210,6 +213,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">IP da Rede</label>
                                     <input type="text" class="form-control" formControlName="rede"
+                                        placeholder="Ex: 192.168.1.0"
                                         [class.is-invalid]="formAddRede.get('rede')?.invalid && formAddRede.get('rede')?.touched">
 
                                     <div class="invalid-feedback"
@@ -220,6 +224,22 @@
                                         *ngIf="formAddRede.get('rede')?.hasError('pattern') && formAddRede.get('rede')?.touched">
                                         Informe uma rede válida no formato 192.168.1.0
                                     </div>
+                                </div>
+
+                                <!-- Modo Wireless -->
+                                <div class="mb-3">
+                                    <label class="form-label">Modo Wireless</label>
+                                    <select class="form-select" formControlName="modoWireless"
+                                        [class.is-invalid]="formAddRede.get('modoWireless')?.invalid && formAddRede.get('modoWireless')?.touched">
+                                        <option value="">Selecione o modo...</option>
+                                        <option value="AP">AP (Access Point)</option>
+                                        <option value="STATION">STATION (Cliente)</option>
+                                    </select>
+                                    <div class="invalid-feedback"
+                                        *ngIf="formAddRede.get('modoWireless')?.hasError('required') && formAddRede.get('modoWireless')?.touched">
+                                        Modo Wireless é obrigatório.
+                                    </div>
+                                    <small class="text-muted">Este campo não pode ser alterado após o cadastro.</small>
                                 </div>
 
                                 <!-- Mensagem retorno -->

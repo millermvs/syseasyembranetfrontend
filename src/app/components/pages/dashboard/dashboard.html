@@ -1,167 +1,283 @@
 <div class="container-fluid dashboard-page">
+
   <!-- TÍTULO -->
-  <div class="row mb-4">
+  <div class="row mb-4 align-items-center">
     <div class="col">
       <h2 class="mb-0">Dashboard</h2>
       <small class="text-muted">Visão geral da rede EasyEmbranet</small>
     </div>
+    <div class="col-auto">
+      <button class="btn btn-sm btn-outline-secondary" (click)="carregarRedes(); carregarEquipamentos()">
+        <i class="bi bi-arrow-clockwise"></i> Atualizar
+      </button>
+    </div>
   </div>
 
-  <!-- Mensagem de alerta -->
-  <div
-    *ngIf="mensagemMedicos()!='' || mensagemPacientes()!='' || mensagemConsultasHoje()!='' || mensagemConsultasMes()!=''"
-    class="alert alert-danger alert-dismissible fade show">
-    <strong>
-      <div *ngIf="mensagemMedicos()!=''">{{mensagemMedicos()}}</div>
-      <div *ngIf="mensagemPacientes()!=''">{{mensagemPacientes()}}</div>
-      <div *ngIf="mensagemConsultasHoje()!=''">{{mensagemConsultasHoje()}}</div>
-      <div *ngIf="mensagemConsultasMes()!=''">{{mensagemConsultasMes()}}</div>
-    </strong>
-    <button type="button" class="btn-close" aria-label="Close" (click)="mensagemPacientes.set(''); 
-               mensagemMedicos.set(''); 
-               mensagemConsultasMes.set(''); 
-               mensagemConsultasHoje.set('')">
-    </button>
+  <!-- ERRO GERAL -->
+  <div *ngIf="mensagemErro() !== ''" class="alert alert-danger alert-dismissible fade show">
+    <strong>{{ mensagemErro() }}</strong>
+    <button type="button" class="btn-close" (click)="mensagemErro.set('')"></button>
   </div>
 
-  <!-- CARDS SUPERIORES -->
-  <div class="row g-3">
-    <!-- Redes -->
-    <div class="col-12 col-sm-6 col-lg-3">
-      <div class="card dash-card" routerLink="/pages/redes">
+  <!-- ========================================== -->
+  <!-- LINHA 1: CARDS KPI                         -->
+  <!-- ========================================== -->
+  <div class="row g-3 mb-4">
+
+    <!-- Total de Redes -->
+    <div class="col-6 col-sm-6 col-lg-3">
+      <div class="card kpi-card" routerLink="/pages/redes">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-start">
             <div>
-              <h6 class="card-title text-muted mb-1">Redes</h6>
-              <h3 class="mb-0">{{totalRedes()}}</h3>
-            </div>
-            <div class="dash-icon bg-primary-subtle">🖧</div>
-          </div>
-          <small class="text-muted">Redes cadastradas</small>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pacientes -->
-    <div class="col-12 col-sm-6 col-lg-3">
-      <div class="card dash-card" routerLink="/pages/equipamentos">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title text-muted mb-1">Equipamentos</h6>
-              <h3 class="mb-0">{{totalEquipamentos()}}</h3>
-            </div>
-            <div class="dash-icon bg-success-subtle">📡</div>
-          </div>
-          <small class="text-muted">Equipamentos cadastrados</small>
-        </div>
-      </div>
-    </div>
-
-    <!-- Consultas hoje
-    <div class="col-12 col-sm-6 col-lg-3">
-      <div class="card dash-card" routerLink="/pages/consultas">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title text-muted mb-1">Consultas hoje</h6>
-              <h3 class="mb-0">{{totalConsultasHoje()}}</h3>
-            </div>
-            <div class="dash-icon bg-warning-subtle">📅</div>
-          </div>
-          <small class="text-muted">Agendadas para hoje</small>
-        </div>
-      </div>
-    </div>-->
-
-    <!-- Consultas no mês
-    <div class="col-12 col-sm-6 col-lg-3">
-      <div class="card dash-card" routerLink="/pages/consultas">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title text-muted mb-1">Consultas no mês</h6>
-              <h3 class="mb-0">{{totalConsultasMes()}}</h3>
-            </div>
-            <div class="dash-icon bg-info-subtle">📊</div>
-          </div>
-          <small class="text-muted">Total de consultas deste mês</small>
-        </div>
-      </div>
-    </div>
-  </div>-->
-
-  <!-- GRID INFERIOR -->
-  <div class="row mt-4 g-3 dash-lower-grid">
-
-    <!-- 1) Consultas do dia (fixo) -->
-    <div class="col-12 col-md-6 col-xl-3">
-      <div class="card dash-lower-card dash-lower-card--sm">
-        <div class="card-header dash-lower-header">
-          <div class="dash-lower-title">
-            <span>Informações</span>
-          </div>
-
-          <form [formGroup]="formFiltroConsultas" class="dash-lower-filter">
-            <select class="form-select form-select-sm" formControlName="idMedico">
-              <option value="">Lista</option>
-              <option *ngFor="let m of medicos()" [value]="m.idMedico">
-                {{ m.nomeMedico }}
-              </option>
-            </select>
-          </form>
-        </div>
-
-        <div class="card-body dash-lower-body dash-lower-body--scroll">
-          <div *ngIf="consultasHoje().length === 0" class="text-muted">
-            Nenhuma encontrada para hoje.
-          </div>
-
-          <div class="list-group list-group-flush" *ngIf="consultasHoje().length > 0">
-            <div class="list-group-item dash-list-item" *ngFor="let c of consultasHoje()">
-              <div class="dash-list-left">
-                <strong class="dash-paciente">{{ c.nomePaciente }}</strong>
-                <small class="text-muted dash-sub">
-                  🩺{{ c.nomeMedico }} • {{ c.status }}
-                </small>
+              <p class="kpi-label">Total de Redes</p>
+              <h2 class="kpi-value">{{ totalRedes() }}</h2>
+              <div class="d-flex gap-2 mt-1">
+                <span class="kpi-sub badge-ap-sm">AP: {{ totalRedesAP() }}</span>
+                <span class="kpi-sub badge-st-sm">ST: {{ totalRedesStation() }}</span>
               </div>
-
-              <span class="badge bg-light text-dark dash-hora">
-                {{ c.horaConsulta }}
-              </span>
             </div>
+            <div class="kpi-icon bg-primary-subtle">🖧</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 2) CARD GRANDE PARA GRÁFICO -->
-    <div class="col-12 col-md-6 col-xl-6">
-      <div class="card dash-lower-card dash-lower-card--lg">
-        <div class="card-body dash-lower-body dash-chart-body">
-
-          <ng-template #semDados>
-            <div class="dash-chart-empty">
-              <p class="text-muted mb-0">Sem dados para exibir no período.</p>
+    <!-- Total de Equipamentos -->
+    <div class="col-6 col-sm-6 col-lg-3">
+      <div class="card kpi-card" routerLink="/pages/equipamentos">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="kpi-label">Equipamentos</p>
+              <h2 class="kpi-value">{{ totalEquipamentos() }}</h2>
+              <div class="d-flex gap-2 mt-1">
+                <span class="kpi-sub badge-ap-sm">AP: {{ equipamentosAP() }}</span>
+                <span class="kpi-sub badge-st-sm">ST: {{ equipamentosStation() }}</span>
+              </div>
             </div>
-          </ng-template>
+            <div class="kpi-icon bg-success-subtle">📡</div>
+          </div>
         </div>
       </div>
     </div>
 
-
-    <!-- 3) Card pequeno (placeholder) -->
-    <div class="col-12 col-md-6 col-xl-3">
-      <div class="card dash-lower-card dash-lower-card--sm">
-        <div class="card-header dash-lower-header">
-          <span>Card 2</span>
+    <!-- SNMP OK -->
+    <div class="col-6 col-sm-6 col-lg-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="kpi-label">SNMP OK</p>
+              <h2 class="kpi-value text-success">{{ equipamentosSucesso() }}</h2>
+              <small class="text-muted">equipamentos respondendo</small>
+            </div>
+            <div class="kpi-icon bg-success-subtle">✅</div>
+          </div>
         </div>
-        <div class="card-body dash-lower-body">
-          <div class="dash-empty">
-            Espaço para colocar mais informações aqui.
+      </div>
+    </div>
+
+    <!-- Falhas SNMP -->
+    <div class="col-6 col-sm-6 col-lg-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="kpi-label">Falhas SNMP</p>
+              <h2 class="kpi-value" [ngClass]="corTaxaFalha()">{{ equipamentosFalha() }}</h2>
+              <small [ngClass]="corTaxaFalha()">
+                {{ taxaFalhaSNMP() }}% do total
+                <span *ngIf="taxaFalhaSNMP() > 15"> ⚠️ Acima do limite</span>
+              </small>
+            </div>
+            <div class="kpi-icon bg-danger-subtle">🔴</div>
           </div>
         </div>
       </div>
     </div>
 
   </div>
+
+  <!-- ========================================== -->
+  <!-- LINHA 2: PAINÉIS DE ANÁLISE               -->
+  <!-- ========================================== -->
+  <div class="row g-3">
+
+    <!-- PAINEL 1: Distribuição de Sinal -->
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="card panel-card h-100">
+        <div class="card-header panel-header">
+          <span class="panel-title">📶 Qualidade de Sinal</span>
+          <small class="text-muted">Equipamentos com SNMP OK</small>
+        </div>
+        <div class="card-body">
+
+          <!-- Bom -->
+          <div class="signal-row mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="signal-label text-success fw-semibold">Bom (&ge;-60 dBm)</span>
+              <span class="signal-count text-success fw-bold">{{ sinalBom() }}</span>
+            </div>
+            <div class="progress" style="height: 10px; border-radius: 8px;">
+              <div class="progress-bar bg-success" role="progressbar"
+                   [style.width.%]="pctSinal(sinalBom())">
+              </div>
+            </div>
+            <small class="text-muted">{{ pctSinal(sinalBom()) }}% dos ativos</small>
+          </div>
+
+          <!-- Médio -->
+          <div class="signal-row mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="signal-label text-warning fw-semibold">Médio (-61 a -70 dBm)</span>
+              <span class="signal-count text-warning fw-bold">{{ sinalMedio() }}</span>
+            </div>
+            <div class="progress" style="height: 10px; border-radius: 8px;">
+              <div class="progress-bar bg-warning" role="progressbar"
+                   [style.width.%]="pctSinal(sinalMedio())">
+              </div>
+            </div>
+            <small class="text-muted">{{ pctSinal(sinalMedio()) }}% dos ativos</small>
+          </div>
+
+          <!-- Ruim -->
+          <div class="signal-row mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="signal-label text-danger fw-semibold">Ruim (&lt;-70 dBm)</span>
+              <span class="signal-count text-danger fw-bold">{{ sinalRuim() }}</span>
+            </div>
+            <div class="progress" style="height: 10px; border-radius: 8px;">
+              <div class="progress-bar bg-danger" role="progressbar"
+                   [style.width.%]="pctSinal(sinalRuim())">
+              </div>
+            </div>
+            <small class="text-muted">{{ pctSinal(sinalRuim()) }}% dos ativos</small>
+          </div>
+
+          <!-- Sem dado -->
+          <div class="signal-row" *ngIf="sinalSemDado() > 0">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="signal-label text-muted fw-semibold">Sem leitura</span>
+              <span class="signal-count text-muted fw-bold">{{ sinalSemDado() }}</span>
+            </div>
+            <div class="progress" style="height: 10px; border-radius: 8px;">
+              <div class="progress-bar bg-secondary" role="progressbar"
+                   [style.width.%]="pctSinal(sinalSemDado())">
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado vazio -->
+          <div *ngIf="equipamentosSucesso() === 0" class="empty-panel">
+            <p class="text-muted mb-0">Nenhum equipamento com SNMP ativo.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- PAINEL 2: Top Redes por Equipamentos -->
+    <div class="col-12 col-md-6 col-xl-5">
+      <div class="card panel-card h-100">
+        <div class="card-header panel-header">
+          <span class="panel-title">🖧 Redes Cadastradas</span>
+          <a routerLink="/pages/redes" class="btn btn-sm btn-outline-primary">Ver todas</a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0 align-middle dash-table">
+              <thead>
+                <tr>
+                  <th>Rede</th>
+                  <th class="text-center">Modo</th>
+                  <th class="text-center">Equip.</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of redesResumo()">
+                  <td class="fw-semibold">{{ r.rede }}</td>
+                  <td class="text-center">
+                    <span class="badge" [ngClass]="r.modoWireless === 'AP' ? 'bg-primary' : 'bg-warning text-dark'">
+                      {{ r.modoWireless }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="fw-bold">{{ r.totalEquipamentos }}</span>
+                  </td>
+                </tr>
+                <tr *ngIf="redesResumo().length === 0">
+                  <td colspan="3" class="text-center text-muted py-3">Nenhuma rede cadastrada.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAINEL 3: Status dos Equipamentos -->
+    <div class="col-12 col-md-12 col-xl-3">
+      <div class="card panel-card h-100">
+        <div class="card-header panel-header">
+          <span class="panel-title">📊 Status dos Equipamentos</span>
+        </div>
+        <div class="card-body d-flex flex-column gap-3 justify-content-center">
+
+          <!-- SNMP OK -->
+          <div class="status-item status-ok">
+            <div class="status-dot dot-green"></div>
+            <div class="status-info">
+              <span class="status-name">SNMP Ativo</span>
+              <span class="status-num text-success">{{ equipamentosSucesso() }}</span>
+            </div>
+          </div>
+
+          <!-- Falha SNMP -->
+          <div class="status-item status-fail">
+            <div class="status-dot dot-red"></div>
+            <div class="status-info">
+              <span class="status-name">Falha SNMP</span>
+              <span class="status-num text-danger">{{ equipamentosFalha() }}</span>
+            </div>
+          </div>
+
+          <hr class="my-1">
+
+          <!-- APs -->
+          <div class="status-item">
+            <div class="status-dot dot-blue"></div>
+            <div class="status-info">
+              <span class="status-name">Modo AP</span>
+              <span class="status-num text-primary">{{ equipamentosAP() }}</span>
+            </div>
+          </div>
+
+          <!-- Stations -->
+          <div class="status-item">
+            <div class="status-dot dot-yellow"></div>
+            <div class="status-info">
+              <span class="status-name">Modo STATION</span>
+              <span class="status-num" style="color: #b38600;">{{ equipamentosStation() }}</span>
+            </div>
+          </div>
+
+          <hr class="my-1">
+
+          <!-- Alerta limite PRD -->
+          <div *ngIf="taxaFalhaSNMP() > 15" class="alert alert-danger py-2 px-3 mb-0 small">
+            <strong>⚠️ Atenção!</strong> Taxa de falha SNMP ({{ taxaFalhaSNMP() }}%) acima de 15%. Verifique as redes.
+          </div>
+          <div *ngIf="taxaFalhaSNMP() <= 15 && totalEquipamentos() > 0" class="alert alert-success py-2 px-3 mb-0 small">
+            ✅ Taxa de falha SNMP dentro do limite ({{ taxaFalhaSNMP() }}%).
+          </div>
+          <div *ngIf="totalEquipamentos() === 0" class="text-center text-muted small">
+            Nenhum equipamento cadastrado ainda.
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

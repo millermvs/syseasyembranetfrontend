@@ -273,3 +273,8 @@
   background-color: #DCE9FF !important;
 }
 
+/* EXCLUIR */
+.delete-icon:hover {
+  color: #dc3545; /* vermelho bootstrap */
+  transform: scale(1.15);
+}

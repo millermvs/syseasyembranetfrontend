@@ -40,7 +40,8 @@ export class Redes {
         Validators.required,
         Validators.pattern(/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.0$/)
       ]
-    ]
+    ],
+    modoWireless: ['', [Validators.required]]
   });
 
   consultarRedes(pagina = 0) {
